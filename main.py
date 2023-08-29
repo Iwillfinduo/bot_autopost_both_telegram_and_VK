@@ -254,7 +254,7 @@ async def process_age(message: types.Message,album: List[types.Message], state: 
 # Прием Поста без музыки
 class MediaGroupForm(StatesGroup):
     photo_list = State()
-@dp.message_handler(commands=['some_photo'])
+@dp.message_handler(commands=['some_photos'])
 async def MediaGroupCommand(message: types.Message):
     if message.from_user.id == TELEGRAM_ADMIN_ID:
         await MediaGroupForm.photo_list.set()
