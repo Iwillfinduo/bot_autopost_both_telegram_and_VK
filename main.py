@@ -67,11 +67,75 @@ def PostOnVKWall(
         audio_file_names: list = None,
         is_audio_here: bool = False,
         message = ""
-):
+) -> bool:
     list_of_id_uploaded_photos = []
-    count_of_image = len(image_file_names)
-    count_of_uploaded_image = 0
-    while (count_of_image != count_of_uploaded_image):
+    count_of_images = len(image_file_names)
+    # while (count_of_image != count_of_uploaded_image):
+    #     url = "https://api.vk.com/method/photos.getUploadServer"
+    #     response_from_getUploadServer = requests.post(
+    #         url=url,
+    #         params={
+    #             'access_token': token,
+    #             'group_id': owner_id,
+    #             'v': version_vk,
+    #             'album_id': album_id
+    #         }
+    #     )
+    #     try:
+    #         url = response_from_getUploadServer.json()["response"]["upload_url"]
+    #     except:
+    #         print(response_from_getUploadServer)
+    #         print(response_from_getUploadServer)
+    #         return False
+    #     files = {}
+    #     if len(image_file_names) <= 8:
+    #         for i in range(1, len(image_file_names)+1):
+    #             files['file'+str(i)] = (image_file_names[i - 1], open(image_file_names[i - 1], 'rb'), 'multipart/form-data')
+    #         count_of_uploaded_image += len(image_file_names)
+    #         del image_file_names
+    #     else:
+    #         for i in range(1, 9):
+    #             files['file'+str(i)] = (image_file_names[i - 1], open(image_file_names[i - 1], 'rb'), 'multipart/form-data')
+    #         del image_file_names[:8]
+    #         count_of_uploaded_image += 8
+    #     response_from_UploadServer = None
+    #     try:
+    #         response_from_UploadServer = requests.post(
+    #             url=url,
+    #             files=files
+    #         )
+    #     except:
+    #         print(response_from_UploadServer)
+    #         return False
+    #     try:
+    #         json_response_from_UploadServer = response_from_UploadServer.json()
+    #     except:
+    #         print(response_from_UploadServer)
+    #         return False
+    #     url = "https://api.vk.com/method/photos.save"
+    #     response_from_photos_save = requests.post(
+    #         url=url,
+    #         params={
+    #             'access_token': token,
+    #             'v': version_vk,
+    #             'album_id': album_id,
+    #             'group_id': owner_id,
+    #             'server': json_response_from_UploadServer['server'],
+    #             'photos_list': json_response_from_UploadServer['photos_list'],
+    #             'hash': json_response_from_UploadServer['hash']
+    #         }
+    #     )
+    #     try:
+    #         for i in range(len(response_from_photos_save.json()["response"])):
+    #             try:
+    #                 list_of_id_uploaded_photos.append(response_from_photos_save.json()["response"][i]["id"])
+    #             except:
+    #                 print(response_from_photos_save)
+    #                 return False
+    #     except:
+    #         print(response_from_photos_save)
+    #         return False
+    for i in range(count_of_images):
         url = "https://api.vk.com/method/photos.getUploadServer"
         response_from_getUploadServer = requests.post(
             url=url,
@@ -82,27 +146,30 @@ def PostOnVKWall(
                 'album_id': album_id
             }
         )
-        print(response_from_getUploadServer.json())
-        url = response_from_getUploadServer.json()["response"]["upload_url"]
-        files = {}
-        if len(image_file_names) <= 8:
-            for i in range(1, len(image_file_names)+1):
-                files['file'+str(i)] = (image_file_names[i - 1], open(image_file_names[i - 1], 'rb'), 'multipart/form-data')
-            count_of_uploaded_image += len(image_file_names)
-            del image_file_names
-        else:
-            for i in range(1, 9):
-                files['file'+str(i)] = (image_file_names[i - 1], open(image_file_names[i - 1], 'rb'), 'multipart/form-data')
-            del image_file_names[:8]
-            count_of_uploaded_image += 8
-        print(files)
-        response_from_UploadServer = requests.post(
-            url=url,
-            files=files
-        )
-        print(response_from_UploadServer)
-        json_response_from_UploadServer = response_from_UploadServer.json()
-        print(json_response_from_UploadServer)
+        try:
+            url = response_from_getUploadServer.json()["response"]["upload_url"]
+        except:
+            print(response_from_getUploadServer)
+            print("response_from_getUploadServer 154")
+            return False
+        file = {}
+        file['file1'] = (image_file_names[i], open(image_file_names[i], 'rb'), 'multipart/form-data')
+        response_from_UploadServer = None
+        try:
+            response_from_UploadServer = requests.post(
+                url=url,
+                files=file
+            )
+        except:
+            print(response_from_UploadServer)
+            print("response_from_UploadServer 166")
+            return False
+        try:
+            json_response_from_UploadServer = response_from_UploadServer.json()
+        except:
+            print(response_from_UploadServer)
+            print("response_from_UploadServer 172")
+            return False
         url = "https://api.vk.com/method/photos.save"
         response_from_photos_save = requests.post(
             url=url,
@@ -116,8 +183,20 @@ def PostOnVKWall(
                 'hash': json_response_from_UploadServer['hash']
             }
         )
-        for i in range(len(response_from_photos_save.json()["response"])):
-            list_of_id_uploaded_photos.append(response_from_photos_save.json()["response"][i]["id"])
+        try:
+            for j in range(len(response_from_photos_save.json()["response"])):
+                try:
+                    list_of_id_uploaded_photos.append(response_from_photos_save.json()["response"][0]["id"])
+                except Exception as e:
+                    print(response_from_photos_save)
+                    print("response_from_photos_save 193")
+                    print(e)
+                    print(response_from_photos_save.json()["response"])
+                    return False
+        except:
+            print(response_from_photos_save)
+            print("response_from_photos_save 197")
+            return False
 
 
     response_from_audio_save = None
@@ -130,15 +209,24 @@ def PostOnVKWall(
                 'v': version_vk,
             }
         )
-        print(response_from_getUploadServer.json())
-        url = response_from_getUploadServer.json()["response"]["upload_url"]
+        try:
+            url = response_from_getUploadServer.json()["response"]["upload_url"]
+        except:
+            print(response_from_getUploadServer)
+            print('response_from_getUploadServer 215')
+            return False
         files = {}
         files['file'] = (audio_file_names, open(audio_file_names, 'rb'), 'multipart/form-data')
-        json_response_from_UploadServer = requests.post(
-            url=url,
-            files=files
-        ).json()
-        print(json_response_from_UploadServer)
+        json_response_from_UploadServer = None
+        try:
+            json_response_from_UploadServer = requests.post(
+                url=url,
+                files=files
+            ).json()
+        except:
+            print(json_response_from_UploadServer)
+            print("json_response_from_UploadServer 227")
+            return False
         url = "https://api.vk.com/method/audio.save"
         response_from_audio_save = requests.post(
             url=url,
@@ -152,13 +240,16 @@ def PostOnVKWall(
         )
 
     url = "https://api.vk.com/method/wall.post"
-    print(response_from_photos_save)
     attachments = ''
     if is_audio_here:
-        attachments = attachments+f'audio{VK_USER_ID}_{response_from_audio_save.json()["response"]["id"]}'+','
-    for i in range(count_of_image):
+        try:
+            attachments = attachments+f'audio{VK_USER_ID}_{response_from_audio_save.json()["response"]["id"]}'+','
+        except:
+            print(response_from_audio_save)
+            print("response_from_audio_save 248")
+            return False
+    for i in range(count_of_images):
         attachments = attachments+f'photo-{owner_id}_{list_of_id_uploaded_photos[i]}'+','
-    print(attachments)
     response_from_wall_post = requests.post(
         url=url,
         params= {
@@ -170,13 +261,21 @@ def PostOnVKWall(
             'message': message
         }
     )
+    try:
+        print(response_from_wall_post.json()['response']['post_id'])
+    except:
+        print(response_from_wall_post)
+        print("response_from_wall_post 268")
+        return False
     print(attachments)
     print(response_from_wall_post.json())
+    print("VK POST IS SUCCESSFUL")
+    return True
 
 # Начало работы
 @dp.message_handler(commands=['start', 'info'])
 async def StartCommand(message: types.Message):
-    await message.reply("Возможности:\n/audio - отправка нескольких фото с музыкой\n/some_photos - отправка нескольких фото \n/one_photo - отправка одного фото\n/cancel - отменить отправку уже после введения команды")
+    await message.reply("Возможности:\n/audio - отправка нескольких фото с музыкой\n/some_photo - отправка нескольких фото \n/one_photo - отправка одного фото\n/cancel - отменить отправку уже после введения команды")
 
 # Прием Поста с Музыкой
 class AudioForm(StatesGroup):
@@ -210,11 +309,14 @@ async def GetAudio(message: types.Message, state: FSMContext):
             data['audio_id'] = message.audio.file_id
 
         await AudioForm.next()
-        await message.reply("Теперь отправь фото")
+        await message.reply("Теперь отправь до 9 фото")
 
 @dp.message_handler(content_types=types.ContentType.ANY, state=AudioForm.photo_list)
 async def process_age(message: types.Message,album: List[types.Message], state: FSMContext):
     if message.from_user.id == TELEGRAM_ADMIN_ID:
+        if len(album) > 9:
+            await message.reply("Ты еблан блять, написано же до 9 фото, отправь заново")
+            return
         """This handler will receive a complete album of any type."""
         media_group = types.MediaGroup()
         counter = 0
@@ -239,15 +341,20 @@ async def process_age(message: types.Message,album: List[types.Message], state: 
                     media_group.attach({"media": file_id, "type": obj.content_type})
             except ValueError:
                 return await message.answer("This type of album is not supported by aiogram.")
-        await bot.send_media_group(chat_id=TELEGRAM_CHANNEL_ID, media=media_group,)
         audio_file_names = None
         audio_id = None
         async with state.proxy() as data:
             audio_file_names = data['audio']
             audio_id = data['audio_id']
-        await bot.send_audio(chat_id=TELEGRAM_CHANNEL_ID, audio=audio_id)
         time.sleep(5)
-        PostOnVKWall(VK_TOKEN, VK_PUBLIC_ID, VK_ALBUM_ID, "5.131", list_of_downloaded_photo, message=caption, audio_file_names=audio_file_names, is_audio_here=True)
+        if PostOnVKWall(VK_TOKEN, VK_PUBLIC_ID, VK_ALBUM_ID, "5.131", list_of_downloaded_photo, message=caption, audio_file_names=audio_file_names, is_audio_here=True) :
+            await bot.send_media_group(chat_id=TELEGRAM_CHANNEL_ID, media=media_group, )
+            await bot.send_audio(chat_id=TELEGRAM_CHANNEL_ID, audio=audio_id)
+        else:
+            print("Ошибка отправки поста в вк, лог должен быть выше")
+            await state.finish()
+            return
+        await message.reply("Отправка успешна")
         await state.finish()
 
 
@@ -258,7 +365,7 @@ class MediaGroupForm(StatesGroup):
 async def MediaGroupCommand(message: types.Message):
     if message.from_user.id == TELEGRAM_ADMIN_ID:
         await MediaGroupForm.photo_list.set()
-        await message.reply("Отправь несколько фото")
+        await message.reply("Отправь несколько фото до 10")
 
 @dp.message_handler(state='*', commands='cancel')
 @dp.message_handler(Text(equals='отмена', ignore_case=True), state='*')
@@ -298,9 +405,14 @@ async def handle_albums(message: types.Message, album: List[types.Message], stat
                     media_group.attach({"media": file_id, "type": obj.content_type})
             except ValueError:
                 return await message.answer("This type of album is not supported by aiogram.")
-        await bot.send_media_group(chat_id=TELEGRAM_CHANNEL_ID, media=media_group,)
-        time.sleep(5)
-        PostOnVKWall(VK_TOKEN, VK_PUBLIC_ID, VK_ALBUM_ID, "5.131", list_of_downloaded_photo, message=caption)
+        time.sleep(3)
+        if PostOnVKWall(VK_TOKEN, VK_PUBLIC_ID, VK_ALBUM_ID, "5.131", list_of_downloaded_photo, message=caption):
+            await bot.send_media_group(chat_id=TELEGRAM_CHANNEL_ID, media=media_group, )
+        else:
+            print("Ошибка отправки поста в вк, лог должен быть выше")
+            await state.finish()
+            return
+        await message.reply("Отправка успешна")
         await state.finish()
 
 #Прием поста с одним фото
@@ -327,12 +439,17 @@ async def CanselOnePhoto(message: types.Message, state: FSMContext):
 @dp.message_handler(state=OnePhotoForm.one_photo, content_types=types.ContentType.PHOTO)
 async def OnePhoto(message: types.Message, state:FSMContext):
     if message.from_user.id == TELEGRAM_ADMIN_ID:
-        await bot.send_photo(chat_id=TELEGRAM_CHANNEL_ID, photo=message.photo[-1].file_id, caption=message.caption)
         print(message.caption)
         await message.photo[-1].download('1.png')
         time.sleep(1.5)
         list = ['1.png']
-        PostOnVKWall(VK_TOKEN, VK_PUBLIC_ID, VK_ALBUM_ID, "5.131", list, message=message.caption)
+        if PostOnVKWall(VK_TOKEN, VK_PUBLIC_ID, VK_ALBUM_ID, "5.131", list, message=message.caption):
+            await bot.send_photo(chat_id=TELEGRAM_CHANNEL_ID, photo=message.photo[-1].file_id, caption=message.caption)
+        else:
+            print("Ошибка отправки поста в вк, лог должен быть выше")
+            await state.finish()
+            return
+        await message.reply("Отправка успешна")
         await state.finish()
 
 
