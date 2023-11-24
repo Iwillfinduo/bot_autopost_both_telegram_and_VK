@@ -193,9 +193,10 @@ def PostOnVKWall(
                     print(e)
                     print(response_from_photos_save.json()["response"])
                     return False
-        except:
+        except Exception as e:
             print(response_from_photos_save)
             print("response_from_photos_save 197")
+            print(ex)
             return False
 
 
@@ -275,7 +276,7 @@ def PostOnVKWall(
 # Начало работы
 @dp.message_handler(commands=['start', 'info'])
 async def StartCommand(message: types.Message):
-    await message.reply("Возможности:\n/audio - отправка нескольких фото с музыкой\n/some_photo - отправка нескольких фото \n/one_photo - отправка одного фото\n/cancel - отменить отправку уже после введения команды")
+    await message.reply("Возможности:\n/audio - отправка нескольких фото с музыкой\n/some_photos - отправка нескольких фото \n/one_photo - отправка одного фото\n/cancel - отменить отправку уже после введения команды")
 
 # Прием Поста с Музыкой
 class AudioForm(StatesGroup):
